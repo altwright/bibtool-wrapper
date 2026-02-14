@@ -13,7 +13,7 @@ int main(int argc, char **argv) {
     bool failed = bib_open_db("data/Mearsheimer_realism.bib");
     assert(!failed);
 
-    bib_get_html_reference("SmithNicholasRoss2022MRat", CITE_STYLE_APA);
+    bib_get_reference_html("SmithNicholasRoss2022MRat", CITE_STYLE_APA);
 
     bib_close_db();
 }

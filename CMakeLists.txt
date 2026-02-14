@@ -5,6 +5,13 @@ set(CMAKE_C_STANDARD 23)
 
 add_library(bibtool_wrapper STATIC
         library.c
+        apa.c
+        apa.h
+        records.c
+        records.h
+        types.h
+        types.c
+        bibtool_guard.h
 )
 
 add_executable(bibtool_wrapper_test
