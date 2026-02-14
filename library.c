@@ -12,12 +12,12 @@
 static DB g_db = NoDB;
 
 void bib_init(const char *program_name) {
-    DynamicString dup_program_name = dyn_str_make("%s", program_name);
+    string dup_program_name = str_make("%s", program_name);
 
     init_error(stderr);
     init_bibtool(dup_program_name.data);
 
-    dyn_str_free(&dup_program_name);
+    str_free(&dup_program_name);
 }
 
 bool bib_open_db(const char *filepath) {
@@ -25,10 +25,10 @@ bool bib_open_db(const char *filepath) {
 
     g_db = new_db();
 
-    DynamicString dup_filepath = dyn_str_make("%s", filepath);
+    string dup_filepath = str_make("%s", filepath);
     result = read_db(g_db, (String) dup_filepath.data, false);
 
-    dyn_str_free(&dup_filepath);
+    str_free(&dup_filepath);
 
     return result;
 }
@@ -43,10 +43,10 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
         return nullptr;
     }
 
-    DynamicString html_str = {};
+    string html_str = {};
 
-    DynamicString key_str = dyn_str_make("%s", citation_key);
-    dyn_str_to_lower(&key_str);
+    string key_str = str_make("%s", citation_key);
+    str_to_lower(&key_str);
 
     Symbol key_symbol = symbol((String) key_str.data);
     if (!key_symbol) {
@@ -67,6 +67,7 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
     switch (style) {
         case CITE_STYLE_APA: {
             switch (record_type_enum) {
+                case ENTRY_TYPE_ARTICLE:
                 case ENTRY_TYPE_BOOK: {
                     html_str = apa_create_book_reference_html(record);
                     break;

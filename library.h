@@ -5,7 +5,8 @@
 #include <stdio.h>
 
 typedef enum : uint32_t {
-    CITE_STYLE_APA = 0,
+    CITE_STYLE_CHICAGO = 0,
+    CITE_STYLE_APA,
     CITE_STYLE_COUNT
 } CitationStyle;
 
