@@ -298,5 +298,41 @@ string chicago_create_book_note_html(Record record, const char *section_ref) {
 string chicago_create_book_short_note_html(Record record, const char* section_ref) {
     string html = {};
 
+    Names authors = record_get_names(record, FIELD_TYPE_AUTHOR);
+    if (ARRAY_EMPTY(&authors)) {
+        return html;
+    }
+
+    html = str_make("");
+
+    str_append(&html, "<p>");
+
+    for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
+        const Name *author = &authors.data[author_idx];
+
+        if (author->last_name.data) {
+            str_append(&html, "%.*s", author->last_name.len, author->last_name.data);
+        }
+
+        if (author_idx < authors.len - 2 || author_idx == authors.len - 1) {
+            str_append(&html, ", ");
+        } else if (author_idx < authors.len - 1) {
+            str_append(&html, " and ");
+        }
+    }
+
+    string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
+    if (!str_empty(&title_val)) {
+        str_append(&html, "<i>%s</i>", title_val.data);
+    }
+
+    if (section_ref) {
+        str_append(&html, ", %s.", section_ref);
+    } else {
+        str_append(&html, ".");
+    }
+
+    str_append(&html, "</p>");
+
     return html;
 }

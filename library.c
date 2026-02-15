@@ -164,6 +164,7 @@ char *bib_create_short_note_html(const char *citation_key, CitationStyle style, 
                 default:
                     return nullptr;
             }
+            break;
         }
         default:
             return nullptr;
