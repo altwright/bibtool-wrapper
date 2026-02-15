@@ -99,4 +99,13 @@ void array_calloc(void **data_ptr, i64 *len, i64 *cap, i64 elem_size);
 
 void array_push(void **data_ptr, i64 *len, i64 *cap, i64 elem_size, const void *new_elem);
 
+#ifndef FOR_EACH
+#define FOR_EACH(ptr_var, array_ptr) \
+    for ( \
+        typeof(*((array_ptr)->data)) ptr_var = (array_ptr)->data; \
+        ptr_var < (array_ptr)->data + (array_ptr)->len; \
+        ptr_var++ \
+    )
+#endif
+
 #endif //BIBTOOL_WRAPPER_INTS_H

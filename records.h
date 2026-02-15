@@ -28,6 +28,8 @@ typedef enum : u32 {
 #ifndef X_FIELD_TYPES
 #define X_FIELD_TYPES \
     X(AUTHOR) \
+    X(TITLE) \
+    X(YEAR) \
     X(TRANSLATOR) \
     X(COUNT)
 #endif
@@ -44,19 +46,19 @@ typedef struct {
     string_view first_name;
     string_view last_name;
     string_view suffix;
-} Author;
+} Name;
 
 typedef struct {
-    ARRAY(Author)
+    ARRAY(Name)
     string str;
-} Authors;
+} Names;
 
 EntryType record_get_entry_type(Record record);
 
 string record_get_value_str(Record record, FieldType field);
 
-Authors record_get_authors(Record record);
+Names record_get_names(Record record, FieldType field);
 
-void authors_free(Authors* authors);
+void names_free(Names* names);
 
 #endif //BIBTOOL_WRAPPER_RECORDS_H

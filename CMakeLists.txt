@@ -5,8 +5,8 @@ set(CMAKE_C_STANDARD 23)
 
 add_library(bibtool_wrapper STATIC
         library.c
-        apa.c
-        apa.h
+        chicago.c
+        chicago.h
         records.c
         records.h
         types.h
@@ -14,6 +14,8 @@ add_library(bibtool_wrapper STATIC
         bibtool_guard.h
         arena.c
         arena.h
+        chars.c
+        chars.h
 )
 
 add_executable(bibtool_wrapper_test

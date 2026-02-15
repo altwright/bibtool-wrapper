@@ -5,9 +5,10 @@
 #include "records.h"
 
 #include <ctype.h>
+#include <string.h>
 
 #include "types.h"
-#include <string.h>
+#include "chars.h"
 
 static const char *k_field_type_strs[] = {
 #ifndef X
@@ -114,48 +115,10 @@ string record_get_value_str(Record record, FieldType field) {
     return value;
 }
 
-static i64 find_next_nonspace_char_idx(const char *str) {
-    i64 idx = -1;
+Names record_get_names(Record record, FieldType field) {
+    Names authors = {};
 
-    if (!str) {
-        return idx;
-    }
-
-    i64 str_len = (i64) strlen(str);
-
-    for (i64 char_idx = 1; char_idx < str_len; char_idx++) {
-        if (!isspace(str[char_idx])) {
-            idx = char_idx;
-            break;
-        }
-    }
-
-    return idx;
-}
-
-static i64 find_next_space_char_idx(const char *str) {
-    i64 idx = -1;
-
-    if (!str) {
-        return idx;
-    }
-
-    i64 str_len = (i64) strlen(str);
-
-    for (i64 char_idx = 1; char_idx < str_len; char_idx++) {
-        if (isspace(str[char_idx])) {
-            idx = char_idx;
-            break;
-        }
-    }
-
-    return idx;
-}
-
-Authors record_get_authors(Record record) {
-    Authors authors = {};
-
-    authors.str = record_get_value_str(record, FIELD_TYPE_AUTHOR);
+    authors.str = record_get_value_str(record, field);
 
     if (!str_empty(&authors.str)) {
         ARRAY_MAKE(&authors);
@@ -192,7 +155,7 @@ Authors record_get_authors(Record record) {
 
         if (not_empty) {
             for (i32 author_idx = 0; author_idx < and_substr_indexes.len + 1; author_idx++) {
-                Author author = {};
+                Name author = {};
 
                 string_view author_str_view = {
                     .data = author_name_start,
@@ -201,7 +164,11 @@ Authors record_get_authors(Record record) {
                 if (author_idx < and_substr_indexes.len) {
                     i64 author_name_start_idx = author_name_start - authors.str.data;
                     i64 next_and_substr_idx = and_substr_indexes.data[author_idx];
-                    author_str_view.len = next_and_substr_idx - author_name_start_idx;
+                    i64 last_nonspace_idx = find_prior_nonspace_char_idx(author_name_start, next_and_substr_idx);
+                    if (last_nonspace_idx < 0) {
+                        last_nonspace_idx = next_and_substr_idx;
+                    }
+                    author_str_view.len = last_nonspace_idx - author_name_start_idx;
                 } else {
                     author_str_view.len = (i64) strlen(author_name_start);
                 }
@@ -315,7 +282,7 @@ Authors record_get_authors(Record record) {
     return authors;
 }
 
-void authors_free(Authors* authors) {
-    ARRAY_FREE(authors);
-    str_free(&authors->str);
+void names_free(Names *names) {
+    ARRAY_FREE(names);
+    str_free(&names->str);
 }

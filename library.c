@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "apa.h"
+#include "chicago.h"
 #include "types.h"
 #include "records.h"
 #include "bibtool_guard.h"
@@ -65,11 +65,11 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
     }
 
     switch (style) {
-        case CITE_STYLE_APA: {
+        case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
                 case ENTRY_TYPE_ARTICLE:
                 case ENTRY_TYPE_BOOK: {
-                    html_str = apa_create_book_reference_html(record);
+                    html_str = chicago_create_book_bib_entry_html(record);
                     break;
                 }
                 default:
