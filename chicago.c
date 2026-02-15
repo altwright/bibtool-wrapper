@@ -176,13 +176,7 @@ string chicago_create_book_bib_entry_html(Record record) {
     string series_val = record_get_value_str(record, FIELD_TYPE_SERIES);
 
     if (!str_empty(&title_val)) {
-        str_append(&html, "<i>%s</i>", title_val.data);
-
-        if (!str_empty(&series_val)) {
-            str_append(&html, ", ");
-        } else {
-            str_append(&html, ". ");
-        }
+        str_append(&html, "<i>%s</i>. ", title_val.data);
     }
 
     if (!str_empty(&series_val)) {
