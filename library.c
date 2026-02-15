@@ -52,15 +52,7 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
 
     arena_free(0);
 
-    string key_str = str_make("%s", citation_key);
-    str_to_lower(&key_str);
-
-    Symbol key_symbol = symbol((String) key_str.data);
-    if (!key_symbol) {
-        return nullptr;
-    }
-
-    Record record = db_find(g_db, key_symbol);
+    Record record = record_get_from_db(g_db, citation_key);
     if (record == RecordNULL) {
         return nullptr;
     }
@@ -98,3 +90,32 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
 
     return out_html;
 }
+
+char *bib_create_note_html(const char *citation_key, CitationStyle style) {
+    if (!g_db || !citation_key) {
+        return nullptr;
+    }
+
+    arena_free(0);
+
+    char* out_html = nullptr;
+
+    arena_free(0);
+
+    return out_html;
+}
+
+char *bib_create_short_note_html(const char *citation_key, CitationStyle style) {
+    if (!g_db || !citation_key) {
+        return nullptr;
+    }
+
+    arena_free(0);
+
+    char* out_html = nullptr;
+
+    arena_free(0);
+
+    return out_html;
+}
+

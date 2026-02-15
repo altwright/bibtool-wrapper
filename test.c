@@ -17,7 +17,6 @@ int main(int argc, char **argv) {
     char *html_str = bib_create_bib_entry_html("jewish_war", CITE_STYLE_CHICAGO);
 
     if (html_str) {
-        printf("%s\n", html_str);
         free(html_str);
     }
 

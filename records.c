@@ -276,3 +276,26 @@ Names record_get_names(Record record, FieldType field) {
 
     return authors;
 }
+
+Record record_get_from_db(DB db, const char *key) {
+    Record record = RecordNULL;
+
+    if (db == NoDB || !key) {
+        return record;
+    }
+
+    string key_str = str_make("%s", key);
+    str_to_lower(&key_str);
+
+    Symbol key_symbol = symbol((String) key_str.data);
+    if (!key_symbol) {
+        return record;
+    }
+
+    record = db_find(db, key_symbol);
+    if (record == RecordNULL) {
+        return record;
+    }
+
+    return record;
+}

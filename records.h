@@ -62,4 +62,6 @@ string record_get_value_str(Record record, FieldType field);
 
 Names record_get_names(Record record, FieldType field);
 
+Record record_get_from_db(DB db, const char* key);
+
 #endif //BIBTOOL_WRAPPER_RECORDS_H
