@@ -14,11 +14,14 @@ int main(int argc, char **argv) {
     bool failed = bib_open_db("data/library.bib");
     assert(!failed);
 
-    char *html_str = bib_get_reference_html("jewish_war", CITE_STYLE_CHICAGO);
+    char *html_str = bib_create_bib_entry_html("jewish_war", CITE_STYLE_CHICAGO);
 
     if (html_str) {
+        printf("%s\n", html_str);
         free(html_str);
     }
 
     bib_close_db();
+
+    bib_uninit();
 }

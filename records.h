@@ -62,6 +62,4 @@ string record_get_value_str(Record record, FieldType field);
 
 Names record_get_names(Record record, FieldType field);
 
-void names_free(Names* names);
-
 #endif //BIBTOOL_WRAPPER_RECORDS_H

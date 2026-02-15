@@ -13,6 +13,8 @@ void arena_uninit();
 
 void *arena_alloc(i64 size);
 
-void arena_free(void *ptr);
+i64 arena_offset(void* ptr);
+
+void arena_free(i64 from);
 
 #endif //BIBTOOL_WRAPPER_ARENA_H

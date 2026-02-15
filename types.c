@@ -5,10 +5,11 @@
 #include "types.h"
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
 #include <string.h>
+
+#include "arena.h"
 
 void array_calloc(void **data_ptr, i64 *len, i64 *cap, i64 elem_size) {
     if (*len < 0) {
@@ -23,8 +24,9 @@ void array_calloc(void **data_ptr, i64 *len, i64 *cap, i64 elem_size) {
         *cap = 8;
     }
 
-    *data_ptr = calloc(*cap, elem_size);
+    *data_ptr = arena_alloc((*cap) * elem_size);
     assert(*data_ptr);
+    memset(*data_ptr, 0, (*cap) * elem_size);
 }
 
 void array_push(void **data_ptr, i64 *len, i64 *cap, i64 elem_size, const void *new_elem) {
@@ -33,8 +35,10 @@ void array_push(void **data_ptr, i64 *len, i64 *cap, i64 elem_size, const void *
 
     if (*len == *cap) {
         i64 new_cap = 2 * (*cap);
-        void *new_data = realloc(*data_ptr, new_cap * elem_size);
+        void *new_data = arena_alloc(new_cap * elem_size);
         assert(new_data);
+        memcpy(new_data, *data_ptr, (*len) * elem_size);
+
         *data_ptr = new_data;
         *cap = new_cap;
     }
@@ -62,8 +66,9 @@ string str_make(const char *fmt, ...) {
         .cap = cap,
     };
 
-    str.data = calloc(cap, sizeof(char));
+    str.data = arena_alloc(cap * (i64)sizeof(char));
     assert(str.data);
+    memset(str.data, 0, cap * (i64)sizeof(char));
 
     i32 bytes_written = vsnprintf(str.data, len + 1, fmt, args_write);
     assert(bytes_written == len);
@@ -83,8 +88,9 @@ void str_append(string *str, const char *fmt, ...) {
 
     while ((len + 1) > (str->cap - str->len)) {
         i64 new_cap = 2 * str->cap;
-        char *new_data = realloc(str->data, new_cap * sizeof(char));
+        char *new_data = arena_alloc(new_cap * (i64)sizeof(char));
         assert(new_data);
+        memcpy(new_data, str->data, str->len);
         str->data = new_data;
         str->cap = new_cap;
     }
@@ -110,15 +116,6 @@ void str_to_upper(string *str) {
     }
 }
 
-void str_free(string *str) {
-    if (str->data) {
-        free(str->data);
-    }
-    str->data = nullptr;
-    str->cap = 0;
-    str->len = 0;
-}
-
 bool str_empty(const string *str) {
     return !str->data || str->len <= 0 || str->cap <= 0;
 }
@@ -131,8 +128,9 @@ string str_dup(const string* str) {
         .cap = str->cap,
     };
 
-    new_str.data = calloc(new_str.cap, sizeof(char));
+    new_str.data = arena_alloc(new_str.cap * (i64)sizeof(char));
     assert(new_str.data);
+    memset(new_str.data, 0, new_str.cap * (i64)sizeof(char));
 
     memcpy(new_str.data, str->data, str->len);
 

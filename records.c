@@ -257,8 +257,6 @@ Names record_get_names(Record record, FieldType field) {
                     }
                 }
 
-                ARRAY_FREE(&comma_indexes);
-
                 ARRAY_PUSH(&authors, &author);
 
                 if (author_idx < and_substr_indexes.len) {
@@ -274,15 +272,7 @@ Names record_get_names(Record record, FieldType field) {
                 }
             }
         }
-
-        str_free(&lowered_author_str);
-        ARRAY_FREE(&and_substr_indexes);
     }
 
     return authors;
-}
-
-void names_free(Names *names) {
-    ARRAY_FREE(names);
-    str_free(&names->str);
 }

@@ -8,16 +8,23 @@
 #include "types.h"
 #include "records.h"
 #include "bibtool_guard.h"
+#include "arena.h"
 
 static DB g_db = NoDB;
 
 void bib_init(const char *program_name) {
+    arena_init(1024ULL * 1024ULL);
+
     string dup_program_name = str_make("%s", program_name);
 
     init_error(stderr);
     init_bibtool(dup_program_name.data);
 
-    str_free(&dup_program_name);
+    arena_free(0);
+}
+
+void bib_uninit() {
+    arena_uninit();
 }
 
 bool bib_open_db(const char *filepath) {
@@ -28,7 +35,7 @@ bool bib_open_db(const char *filepath) {
     string dup_filepath = str_make("%s", filepath);
     result = read_db(g_db, (String) dup_filepath.data, false);
 
-    str_free(&dup_filepath);
+    arena_free(0);
 
     return result;
 }
@@ -38,12 +45,12 @@ void bib_close_db() {
     g_db = NoDB;
 }
 
-char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
+char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
     if (!g_db || !citation_key) {
         return nullptr;
     }
 
-    string html_str = {};
+    arena_free(0);
 
     string key_str = str_make("%s", citation_key);
     str_to_lower(&key_str);
@@ -64,6 +71,8 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
         return nullptr;
     }
 
+    string html_str = {};
+
     switch (style) {
         case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
@@ -80,5 +89,12 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
             return nullptr;
     }
 
-    return html_str.data;
+    char *out_html = malloc(html_str.len + 1);
+    assert(out_html);
+    memcpy(out_html, html_str.data, html_str.len);
+    out_html[html_str.len] = '\0';
+
+    arena_free(0);
+
+    return out_html;
 }

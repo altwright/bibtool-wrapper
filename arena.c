@@ -89,14 +89,12 @@ void *arena_alloc(i64 size) {
     return data;
 }
 
-void arena_free(void *ptr) {
-    if (!g_buffer) {
-        return;
-    }
+i64 arena_offset(void* ptr) {
+    i64 ptr_offset = -1;
 
     ArenaBuffer *current_buffer = g_buffer;
     u8 *byte_ptr = ptr;
-    g_current_arena_offset = 0;
+    i64 offset = 0;
 
     while (
         current_buffer &&
@@ -105,13 +103,19 @@ void arena_free(void *ptr) {
             (byte_ptr < current_buffer->data + current_buffer->cap)
         )
     ) {
-        g_current_arena_offset += current_buffer->cap;
+        offset += current_buffer->cap;
         current_buffer = current_buffer->next;
     }
 
     if (current_buffer) {
         i64 byte_ptr_offset = byte_ptr - current_buffer->data;
-        byte_ptr_offset = ((byte_ptr_offset + 3) >> 2) << 2;
-        g_current_arena_offset += byte_ptr_offset;
+        offset += byte_ptr_offset;
+        ptr_offset = offset;
     }
+
+    return ptr_offset;
+}
+
+void arena_free(i64 from) {
+    g_current_arena_offset = from;
 }

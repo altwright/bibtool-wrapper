@@ -37,8 +37,6 @@ typedef struct {
 
 string str_make(const char *fmt, ...);
 
-void str_free(string *str);
-
 void str_append(string *str, const char *fmt, ...);
 
 void str_to_lower(string *str);
@@ -80,19 +78,6 @@ string str_dup(const string *str);
 #ifndef ARRAY_EMPTY
 #define ARRAY_EMPTY(array_ptr) \
     (!(array_ptr)->data || (array_ptr)->len <= 0 || (array_ptr)->cap <= 0)
-#endif
-
-#ifndef ARRAY_FREE
-#define ARRAY_FREE(array_ptr) \
-    do { \
-        if ((array_ptr)->data) \
-        { \
-            free((array_ptr)->data); \
-        } \
-        (array_ptr)->data = nullptr; \
-        (array_ptr)->len = 0; \
-        (array_ptr)->cap = 0; \
-    } while(0)
 #endif
 
 void array_calloc(void **data_ptr, i64 *len, i64 *cap, i64 elem_size);

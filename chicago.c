@@ -133,12 +133,10 @@ string chicago_create_book_bib_entry_html(Record record) {
                 if (!str_empty(&abbrev_first_name)) {
                     str_append(&html, "%.*s", abbrev_first_name.len, abbrev_first_name.data);
                 }
-                str_free(&abbrev_first_name);
             }
         } else {
             string subsequent_name = chicago_format_subsequent_name(author);
             str_append(&html, "%s", subsequent_name.data);
-            str_free(&subsequent_name);
         }
 
         if (author_idx < authors.len - 1) {
@@ -159,7 +157,6 @@ string chicago_create_book_bib_entry_html(Record record) {
 
             string translator_name_fmt = chicago_format_subsequent_name(translator_name);
             str_append(&html, "%s", translator_name_fmt.data);
-            str_free(&translator_name_fmt);
 
             if (translator_name_idx < translators_names.len - 1) {
                 str_append(&html, ", ");
@@ -168,9 +165,6 @@ string chicago_create_book_bib_entry_html(Record record) {
 
         str_append(&html, ". ");
     }
-
-    str_free(&translator_val);
-    names_free(&authors);
 
     string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
     string series_val = record_get_value_str(record, FIELD_TYPE_SERIES);
@@ -182,9 +176,6 @@ string chicago_create_book_bib_entry_html(Record record) {
     if (!str_empty(&series_val)) {
         str_append(&html, "%s. ", series_val.data);
     }
-
-    str_free(&title_val);
-    str_free(&series_val);
 
     string address_val = record_get_value_str(record, FIELD_TYPE_ADDRESS);
     string publisher_val = record_get_value_str(record, FIELD_TYPE_PUBLISHER);
@@ -212,10 +203,6 @@ string chicago_create_book_bib_entry_html(Record record) {
     if (!str_empty(&year_val)) {
         str_append(&html, "%s.", year_val.data);
     }
-
-    str_free(&address_val);
-    str_free(&publisher_val);
-    str_free(&year_val);
 
     str_append(&html, "</p>");
     return html;
