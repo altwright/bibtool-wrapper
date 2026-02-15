@@ -57,4 +57,6 @@ string record_get_value_str(Record record, FieldType field);
 
 Authors record_get_authors(Record record);
 
+void authors_free(Authors* authors);
+
 #endif //BIBTOOL_WRAPPER_RECORDS_H

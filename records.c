@@ -158,15 +158,12 @@ Authors record_get_authors(Record record) {
     authors.str = record_get_value_str(record, FIELD_TYPE_AUTHOR);
 
     if (!str_empty(&authors.str)) {
-        authors.cap = 4;
         ARRAY_MAKE(&authors);
 
         string lowered_author_str = str_dup(&authors.str);
         str_to_lower(&lowered_author_str);
 
-        i64s and_substr_indexes = {
-            .cap = 4
-        };
+        i64s and_substr_indexes = {};
         ARRAY_MAKE(&and_substr_indexes);
 
         char *and_substr_start = lowered_author_str.data;
@@ -209,9 +206,7 @@ Authors record_get_authors(Record record) {
                     author_str_view.len = (i64) strlen(author_name_start);
                 }
 
-                i64s comma_indexes = {
-                    .cap = 4
-                };
+                i64s comma_indexes = {};
                 ARRAY_MAKE(&comma_indexes);
 
                 for (i64 char_idx = 0; char_idx < author_str_view.len; char_idx++) {
@@ -318,4 +313,9 @@ Authors record_get_authors(Record record) {
     }
 
     return authors;
+}
+
+void authors_free(Authors* authors) {
+    ARRAY_FREE(authors);
+    str_free(&authors->str);
 }

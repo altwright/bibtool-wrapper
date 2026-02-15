@@ -47,7 +47,7 @@ void str_to_upper(string *str);
 
 bool str_empty(const string *str);
 
-string str_dup(const string* str);
+string str_dup(const string *str);
 
 #ifndef ARRAY_MAKE
 #define ARRAY_MAKE(array_ptr) \
@@ -85,7 +85,10 @@ string str_dup(const string* str);
 #ifndef ARRAY_FREE
 #define ARRAY_FREE(array_ptr) \
     do { \
-        free((array_ptr)->data); \
+        if ((array_ptr)->data) \
+        { \
+            free((array_ptr)->data); \
+        } \
         (array_ptr)->data = nullptr; \
         (array_ptr)->len = 0; \
         (array_ptr)->cap = 0; \

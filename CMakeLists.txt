@@ -12,6 +12,8 @@ add_library(bibtool_wrapper STATIC
         types.h
         types.c
         bibtool_guard.h
+        arena.c
+        arena.h
 )
 
 add_executable(bibtool_wrapper_test
