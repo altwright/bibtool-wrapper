@@ -77,7 +77,7 @@ static string chicago_format_first_name(string_view first_name_view) {
     return abbrev;
 }
 
-static string chicago_format_subsequent_name(const Name *name) {
+static string chicago_format_name(const Name *name) {
     string html = str_make("");
 
     if (name->first_name.data) {
@@ -135,7 +135,7 @@ string chicago_create_book_bib_entry_html(Record record) {
                 }
             }
         } else {
-            string subsequent_name = chicago_format_subsequent_name(author);
+            string subsequent_name = chicago_format_name(author);
             str_append(&html, "%s", subsequent_name.data);
         }
 
@@ -155,7 +155,7 @@ string chicago_create_book_bib_entry_html(Record record) {
         for (i32 translator_name_idx = 0; translator_name_idx < translators_names.len; translator_name_idx++) {
             const Name *translator_name = &translators_names.data[translator_name_idx];
 
-            string translator_name_fmt = chicago_format_subsequent_name(translator_name);
+            string translator_name_fmt = chicago_format_name(translator_name);
             str_append(&html, "%s", translator_name_fmt.data);
 
             if (translator_name_idx < translators_names.len - 1) {
@@ -205,5 +205,98 @@ string chicago_create_book_bib_entry_html(Record record) {
     }
 
     str_append(&html, "</p>");
+    return html;
+}
+
+string chicago_create_book_note_html(Record record, const char *section_ref) {
+    string html = {};
+
+    Names authors = record_get_names(record, FIELD_TYPE_AUTHOR);
+    if (ARRAY_EMPTY(&authors)) {
+        return html;
+    }
+
+    html = str_make("");
+    str_append(&html, "<p>");
+
+    for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
+        const Name *author = &authors.data[author_idx];
+
+        string author_name_fmt = chicago_format_name(author);
+        str_append(&html, "%s", author_name_fmt.data);
+
+        if (author_idx < authors.len - 2 || author_idx == authors.len - 1) {
+            str_append(&html, ", ");
+        } else if (author_idx < authors.len - 1) {
+            str_append(&html, " and ");
+        }
+    }
+
+    string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
+    string translator_val = record_get_value_str(record, FIELD_TYPE_TRANSLATOR);
+    string publisher_val = record_get_value_str(record, FIELD_TYPE_PUBLISHER);
+    if (!str_empty(&title_val)) {
+        str_append(&html, "<i>%s</i>", title_val.data);
+
+        if (!str_empty(&translator_val)) {
+            str_append(&html, ", trans. ", translator_val.data);
+        } else if (!str_empty(&publisher_val)) {
+            str_append(&html, " ");
+        }
+    }
+
+    if (!str_empty(&translator_val)) {
+        Names translators_names = record_get_names(record, FIELD_TYPE_TRANSLATOR);
+
+        for (i32 translator_name_idx = 0; translator_name_idx < translators_names.len; translator_name_idx++) {
+            const Name *translator_name = &translators_names.data[translator_name_idx];
+
+            string translator_name_fmt = chicago_format_name(translator_name);
+            str_append(&html, "%s", translator_name_fmt.data);
+
+            if (translator_name_idx < translators_names.len - 2) {
+                str_append(&html, ", ");
+            } else if (translator_name_idx < translators_names.len - 1) {
+                str_append(&html, " and ");
+            }
+        }
+
+        str_append(&html, " ");
+    }
+
+    string year_val = record_get_value_str(record, FIELD_TYPE_YEAR);
+    if (!str_empty(&publisher_val) || !str_empty(&year_val)) {
+        str_append(&html, "(");
+
+        if (!str_empty(&publisher_val)) {
+            str_append(&html, "%s", publisher_val.data);
+            if (!str_empty(&year_val)) {
+                str_append(&html, ", ");
+            }
+        }
+
+        if (str_empty(&year_val)) {
+            str_append(&html, ")");
+        }
+    }
+
+    if (!str_empty(&year_val)) {
+        str_append(&html, "%s)", year_val.data);
+    }
+
+    if (section_ref) {
+        str_append(&html, ", %s.", section_ref);
+    } else {
+        str_append(&html, ".");
+    }
+
+    str_append(&html, "</p>");
+
+    return html;
+}
+
+string chicago_create_book_short_note_html(Record record, const char* section_ref) {
+    string html = {};
+
     return html;
 }

@@ -91,31 +91,90 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
     return out_html;
 }
 
-char *bib_create_note_html(const char *citation_key, CitationStyle style) {
+char *bib_create_note_html(const char *citation_key, CitationStyle style, const char* section_ref) {
     if (!g_db || !citation_key) {
         return nullptr;
     }
 
     arena_free(0);
 
-    char* out_html = nullptr;
+    Record record = record_get_from_db(g_db, citation_key);
+    if (record == RecordNULL) {
+        return nullptr;
+    }
+
+    EntryType record_type_enum = record_get_entry_type(record);
+    if (record_type_enum == ENTRY_TYPE_COUNT) {
+        return nullptr;
+    }
+
+    string html_str = {};
+    switch (style) {
+        case CITE_STYLE_CHICAGO: {
+            switch (record_type_enum) {
+                case ENTRY_TYPE_BOOK: {
+                    html_str = chicago_create_book_note_html(record, section_ref);
+                    break;
+                }
+                default:
+                    return nullptr;
+            }
+            break;
+        }
+        default:
+            return nullptr;
+    }
+
+    char *out_html = malloc(sizeof(char) * (html_str.len + 1));
+    assert(out_html);
+    memcpy(out_html, html_str.data, html_str.len);
+    out_html[html_str.len] = '\0';
 
     arena_free(0);
 
     return out_html;
 }
 
-char *bib_create_short_note_html(const char *citation_key, CitationStyle style) {
+char *bib_create_short_note_html(const char *citation_key, CitationStyle style, const char* section_ref) {
     if (!g_db || !citation_key) {
         return nullptr;
     }
 
     arena_free(0);
 
-    char* out_html = nullptr;
+    Record record = record_get_from_db(g_db, citation_key);
+    if (record == RecordNULL) {
+        return nullptr;
+    }
+
+    EntryType record_type_enum = record_get_entry_type(record);
+    if (record_type_enum == ENTRY_TYPE_COUNT) {
+        return nullptr;
+    }
+
+    string html_str = {};
+
+    switch (style) {
+        case CITE_STYLE_CHICAGO: {
+            switch (record_type_enum) {
+                case ENTRY_TYPE_BOOK: {
+                    html_str = chicago_create_book_short_note_html(record, section_ref);
+                    break;
+                }
+                default:
+                    return nullptr;
+            }
+        }
+        default:
+            return nullptr;
+    }
+
+    char *out_html = malloc(sizeof(char) * (html_str.len + 1));
+    assert(out_html);
+    memcpy(out_html, html_str.data, html_str.len);
+    out_html[html_str.len] = '\0';
 
     arena_free(0);
 
     return out_html;
 }
-

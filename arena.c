@@ -117,5 +117,8 @@ i64 arena_offset(void* ptr) {
 }
 
 void arena_free(i64 from) {
+    if (from < 0) {
+        from = 0;
+    }
     g_current_arena_offset = from;
 }

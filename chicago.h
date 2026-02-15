@@ -10,4 +10,8 @@
 
 string chicago_create_book_bib_entry_html(Record record);
 
+string chicago_create_book_note_html(Record record, const char* section_ref);
+
+string chicago_create_book_short_note_html(Record record, const char* section_ref);
+
 #endif //BIBTOOL_WRAPPER_CHICAGO_H
