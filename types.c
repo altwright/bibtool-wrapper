@@ -111,7 +111,9 @@ void str_to_upper(string *str) {
 }
 
 void str_free(string *str) {
-    free(str->data);
+    if (str->data) {
+        free(str->data);
+    }
     str->data = nullptr;
     str->cap = 0;
     str->len = 0;

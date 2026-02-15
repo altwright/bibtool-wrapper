@@ -6,14 +6,19 @@
 
 #include "library.h"
 #include <assert.h>
+#include <stdlib.h>
 
 int main(int argc, char **argv) {
     bib_init("test");
 
-    bool failed = bib_open_db("data/Mearsheimer_realism.bib");
+    bool failed = bib_open_db("data/library.bib");
     assert(!failed);
 
-    bib_get_reference_html("SmithNicholasRoss2022MRat", CITE_STYLE_CHICAGO);
+    char *html_str = bib_get_reference_html("jewish_war", CITE_STYLE_CHICAGO);
+
+    if (html_str) {
+        free(html_str);
+    }
 
     bib_close_db();
 }

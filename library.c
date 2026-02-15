@@ -67,7 +67,6 @@ char *bib_get_reference_html(const char *citation_key, CitationStyle style) {
     switch (style) {
         case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
-                case ENTRY_TYPE_ARTICLE:
                 case ENTRY_TYPE_BOOK: {
                     html_str = chicago_create_book_bib_entry_html(record);
                     break;

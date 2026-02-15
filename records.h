@@ -29,8 +29,11 @@ typedef enum : u32 {
 #define X_FIELD_TYPES \
     X(AUTHOR) \
     X(TITLE) \
+    X(SERIES) \
     X(YEAR) \
     X(TRANSLATOR) \
+    X(PUBLISHER) \
+    X(ADDRESS) \
     X(COUNT)
 #endif
 
