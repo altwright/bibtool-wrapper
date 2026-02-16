@@ -90,6 +90,10 @@ void *arena_alloc(i64 size) {
 }
 
 i64 arena_offset(void* ptr) {
+    if (!ptr) {
+        return g_current_arena_offset;
+    }
+
     i64 ptr_offset = -1;
 
     ArenaBuffer *current_buffer = g_buffer;
