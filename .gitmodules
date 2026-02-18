@@ -1,0 +1,3 @@
+[submodule "libs/altcore"]
+	path = libs/altcore
+	url = git@github.com:altwright/altcore.git
