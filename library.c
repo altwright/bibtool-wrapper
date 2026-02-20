@@ -13,24 +13,33 @@
 
 static DB g_db = NoDB;
 static Arena g_arena = {};
+static bool g_bib_initialized = false;
 
 void bib_init(const char *program_name) {
-    i64 malloc_cap = 1024ULL * 1024ULL;
-    alt_init(malloc_cap);
+    if (!g_bib_initialized) {
+        i64 malloc_cap = 1024LL * 1024LL;
+        alt_init(malloc_cap);
 
-    g_arena = arena_make(malloc_cap / 2);
+        g_arena = arena_make(malloc_cap / 2);
 
-    Arena tmp = g_arena;
+        Arena tmp = g_arena;
 
-    string dup_program_name = str_make(&tmp, "%s", program_name);
+        string dup_program_name = str_make(&tmp, "%s", program_name);
 
-    init_error(stderr);
-    init_bibtool(dup_program_name.data);
+        init_error(stderr);
+        init_bibtool(dup_program_name.data);
+
+        g_bib_initialized = true;
+    }
 }
 
 void bib_uninit() {
-    arena_free(&g_arena);
-    alt_uninit();
+    if (g_bib_initialized) {
+        arena_free(&g_arena);
+        alt_uninit();
+
+        g_bib_initialized = false;
+    }
 }
 
 bool bib_open_db(const char *filepath) {
