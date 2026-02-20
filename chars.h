@@ -5,7 +5,7 @@
 #ifndef BIBTOOL_WRAPPER_CHARS_H
 #define BIBTOOL_WRAPPER_CHARS_H
 
-#include "types.h"
+#include "altcore/types.h"
 
 i64 find_next_nonspace_char_idx(const char *str);
 

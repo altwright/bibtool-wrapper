@@ -19,7 +19,7 @@ static const char *k_field_type_strs[] = {
 #undef X
 };
 
-EntryType record_get_entry_type(Record record) {
+EntryType record_get_entry_type(Arena* arena, Record record) {
     rec_type record_type = RecordType(record);
     if (!IsNormalRecord(record_type)) {
         return ENTRY_TYPE_COUNT;
@@ -30,7 +30,7 @@ EntryType record_get_entry_type(Record record) {
         return ENTRY_TYPE_COUNT;
     }
 
-    string record_type_dyn_str = str_make("%s", record_type_str);
+    string record_type_dyn_str = str_make(arena, "%s", record_type_str);
     str_to_upper(&record_type_dyn_str);
 
     EntryType record_type_enum = ENTRY_TYPE_COUNT;
@@ -51,7 +51,7 @@ else
     return record_type_enum;
 }
 
-static string record_get_value_from_field_str(Record record, const char *field_name_str) {
+static string record_get_value_from_field_str(Arena* arena, Record record, const char *field_name_str) {
     string value = {};
 
     if (!field_name_str) {
@@ -80,7 +80,7 @@ static string record_get_value_from_field_str(Record record, const char *field_n
                 field_value_sym_len--;
             }
 
-            value = str_make("%.*s", field_value_sym_len, (const char *) field_value_sym);
+            value = str_make(arena, "%.*s", field_value_sym_len, (const char *) field_value_sym);
             break;
         }
 
@@ -100,33 +100,33 @@ static const char *field_type_to_str(FieldType type) {
     return field_type_str;
 }
 
-string record_get_value_str(Record record, FieldType field) {
+string record_get_value_str(Arena* arena, Record record, FieldType field) {
     string value = {};
 
-    string field_str = str_make(field_type_to_str(field));
+    string field_str = str_make(arena, field_type_to_str(field));
     if (str_empty(&field_str)) {
         return value;
     }
 
     str_to_lower(&field_str);
 
-    value = record_get_value_from_field_str(record, field_str.data);
+    value = record_get_value_from_field_str(arena, record, field_str.data);
 
     return value;
 }
 
-Names record_get_names(Record record, FieldType field) {
-    Names authors = {};
+Names record_get_names(Arena* arena, Record record, FieldType field) {
+    Names authors = {arena};
 
-    authors.str = record_get_value_str(record, field);
+    authors.str = record_get_value_str(arena, record, field);
 
     if (!str_empty(&authors.str)) {
         ARRAY_MAKE(&authors);
 
-        string lowered_author_str = str_dup(&authors.str);
+        string lowered_author_str = str_dup(arena, &authors.str);
         str_to_lower(&lowered_author_str);
 
-        i64s and_substr_indexes = {};
+        i64s and_substr_indexes = {arena};
         ARRAY_MAKE(&and_substr_indexes);
 
         char *and_substr_start = lowered_author_str.data;
@@ -173,7 +173,7 @@ Names record_get_names(Record record, FieldType field) {
                     author_str_view.len = (i64) strlen(author_name_start);
                 }
 
-                i64s comma_indexes = {};
+                i64s comma_indexes = {arena};
                 ARRAY_MAKE(&comma_indexes);
 
                 for (i64 char_idx = 0; char_idx < author_str_view.len; char_idx++) {
@@ -277,14 +277,14 @@ Names record_get_names(Record record, FieldType field) {
     return authors;
 }
 
-Record record_get_from_db(DB db, const char *key) {
+Record record_get_from_db(Arena* arena, DB db, const char *key) {
     Record record = RecordNULL;
 
     if (db == NoDB || !key) {
         return record;
     }
 
-    string key_str = str_make("%s", key);
+    string key_str = str_make(arena, "%s", key);
     str_to_lower(&key_str);
 
     Symbol key_symbol = symbol((String) key_str.data);

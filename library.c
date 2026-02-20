@@ -4,27 +4,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "altcore/malloc.h"
+#include "altcore/arenas.h"
 #include "chicago.h"
 #include "types.h"
 #include "records.h"
 #include "bibtool_guard.h"
-#include "arena.h"
 
 static DB g_db = NoDB;
+static Arena g_arena = {};
 
 void bib_init(const char *program_name) {
-    arena_init(1024ULL * 1024ULL);
+    i64 malloc_cap = 1024ULL * 1024ULL;
+    alt_init(malloc_cap);
 
-    string dup_program_name = str_make("%s", program_name);
+    g_arena = arena_make(malloc_cap / 2);
+
+    Arena tmp = g_arena;
+
+    string dup_program_name = str_make(&tmp, "%s", program_name);
 
     init_error(stderr);
     init_bibtool(dup_program_name.data);
-
-    arena_free(0);
 }
 
 void bib_uninit() {
-    arena_uninit();
+    arena_free(&g_arena);
+    alt_uninit();
 }
 
 bool bib_open_db(const char *filepath) {
@@ -32,10 +38,10 @@ bool bib_open_db(const char *filepath) {
 
     g_db = new_db();
 
-    string dup_filepath = str_make("%s", filepath);
-    result = read_db(g_db, (String) dup_filepath.data, false);
+    Arena tmp = g_arena;
 
-    arena_free(0);
+    string dup_filepath = str_make(&tmp, "%s", filepath);
+    result = read_db(g_db, (String) dup_filepath.data, false);
 
     return result;
 }
@@ -50,14 +56,14 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
         return nullptr;
     }
 
-    arena_free(0);
+    Arena tmp = g_arena;
 
-    Record record = record_get_from_db(g_db, citation_key);
+    Record record = record_get_from_db(&tmp, g_db, citation_key);
     if (record == RecordNULL) {
         return nullptr;
     }
 
-    EntryType record_type_enum = record_get_entry_type(record);
+    EntryType record_type_enum = record_get_entry_type(&tmp, record);
 
     if (record_type_enum == ENTRY_TYPE_COUNT) {
         return nullptr;
@@ -69,7 +75,7 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
         case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
                 case ENTRY_TYPE_BOOK: {
-                    html_str = chicago_create_book_bib_entry_html(record);
+                    html_str = chicago_create_book_bib_entry_html(&tmp, record);
                     break;
                 }
                 default:
@@ -86,24 +92,22 @@ char *bib_create_bib_entry_html(const char *citation_key, CitationStyle style) {
     memcpy(out_html, html_str.data, html_str.len);
     out_html[html_str.len] = '\0';
 
-    arena_free(0);
-
     return out_html;
 }
 
-char *bib_create_note_html(const char *citation_key, CitationStyle style, const char* section_ref) {
+char *bib_create_note_html(const char *citation_key, CitationStyle style, const char *section_ref) {
     if (!g_db || !citation_key) {
         return nullptr;
     }
 
-    arena_free(0);
+    Arena tmp = g_arena;
 
-    Record record = record_get_from_db(g_db, citation_key);
+    Record record = record_get_from_db(&tmp, g_db, citation_key);
     if (record == RecordNULL) {
         return nullptr;
     }
 
-    EntryType record_type_enum = record_get_entry_type(record);
+    EntryType record_type_enum = record_get_entry_type(&tmp, record);
     if (record_type_enum == ENTRY_TYPE_COUNT) {
         return nullptr;
     }
@@ -113,7 +117,7 @@ char *bib_create_note_html(const char *citation_key, CitationStyle style, const 
         case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
                 case ENTRY_TYPE_BOOK: {
-                    html_str = chicago_create_book_note_html(record, section_ref);
+                    html_str = chicago_create_book_note_html(&tmp, record, section_ref);
                     break;
                 }
                 default:
@@ -130,24 +134,22 @@ char *bib_create_note_html(const char *citation_key, CitationStyle style, const 
     memcpy(out_html, html_str.data, html_str.len);
     out_html[html_str.len] = '\0';
 
-    arena_free(0);
-
     return out_html;
 }
 
-char *bib_create_short_note_html(const char *citation_key, CitationStyle style, const char* section_ref) {
+char *bib_create_short_note_html(const char *citation_key, CitationStyle style, const char *section_ref) {
     if (!g_db || !citation_key) {
         return nullptr;
     }
 
-    arena_free(0);
+    Arena tmp = g_arena;
 
-    Record record = record_get_from_db(g_db, citation_key);
+    Record record = record_get_from_db(&tmp, g_db, citation_key);
     if (record == RecordNULL) {
         return nullptr;
     }
 
-    EntryType record_type_enum = record_get_entry_type(record);
+    EntryType record_type_enum = record_get_entry_type(&tmp, record);
     if (record_type_enum == ENTRY_TYPE_COUNT) {
         return nullptr;
     }
@@ -158,7 +160,7 @@ char *bib_create_short_note_html(const char *citation_key, CitationStyle style, 
         case CITE_STYLE_CHICAGO: {
             switch (record_type_enum) {
                 case ENTRY_TYPE_BOOK: {
-                    html_str = chicago_create_book_short_note_html(record, section_ref);
+                    html_str = chicago_create_book_short_note_html(&tmp, record, section_ref);
                     break;
                 }
                 default:
@@ -174,8 +176,6 @@ char *bib_create_short_note_html(const char *citation_key, CitationStyle style, 
     assert(out_html);
     memcpy(out_html, html_str.data, html_str.len);
     out_html[html_str.len] = '\0';
-
-    arena_free(0);
 
     return out_html;
 }

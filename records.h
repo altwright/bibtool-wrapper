@@ -5,7 +5,8 @@
 #ifndef BIBTOOL_WRAPPER_RECORDS_H
 #define BIBTOOL_WRAPPER_RECORDS_H
 
-#include "types.h"
+#include "altcore/types.h"
+#include "altcore/strings.h"
 #include "bibtool_guard.h"
 
 typedef enum : u32 {
@@ -56,12 +57,12 @@ typedef struct {
     string str;
 } Names;
 
-EntryType record_get_entry_type(Record record);
+EntryType record_get_entry_type(Arena* arena, Record record);
 
-string record_get_value_str(Record record, FieldType field);
+string record_get_value_str(Arena* arena, Record record, FieldType field);
 
-Names record_get_names(Record record, FieldType field);
+Names record_get_names(Arena* arena, Record record, FieldType field);
 
-Record record_get_from_db(DB db, const char* key);
+Record record_get_from_db(Arena* arena, DB db, const char* key);
 
 #endif //BIBTOOL_WRAPPER_RECORDS_H

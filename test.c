@@ -14,7 +14,7 @@ int main(int argc, char **argv) {
     bool failed = bib_open_db("data/library.bib");
     assert(!failed);
 
-    char *html_str = bib_create_short_note_html("jewish_war", CITE_STYLE_CHICAGO, "18.3.3");
+    char *html_str = bib_create_bib_entry_html("jewish_war", CITE_STYLE_CHICAGO);
 
     if (html_str) {
         printf("%s\n", html_str);

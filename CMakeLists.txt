@@ -9,11 +9,7 @@ add_library(bibtool_wrapper STATIC
         chicago.h
         records.c
         records.h
-        types.h
-        types.c
         bibtool_guard.h
-        arena.c
-        arena.h
         chars.c
         chars.h
 )
@@ -22,12 +18,16 @@ add_executable(bibtool_wrapper_test
         test.c
 )
 
+add_subdirectory(libs/altcore)
+
 target_include_directories(bibtool_wrapper PRIVATE
+        libs/
         libs/bibtool/include
 )
 
 target_link_libraries(bibtool_wrapper PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}/libs/bibtool/libbibtool.a
+        altcore
 )
 
 target_include_directories(bibtool_wrapper_test PRIVATE

@@ -9,7 +9,7 @@
 #include "chars.h"
 #include "records.h"
 
-static string chicago_format_first_name(string_view first_name_view) {
+static string chicago_format_first_name(Arena* arena, string_view first_name_view) {
     string abbrev = {};
     const char *first_name_start = first_name_view.data;
     i64 first_name_start_len = first_name_view.len;
@@ -25,9 +25,9 @@ static string chicago_format_first_name(string_view first_name_view) {
         first_name_start_len -= next_nonspace_idx;
     }
 
-    abbrev = str_make("");
+    abbrev = str_make(arena, "");
 
-    i64s space_indexes = {};
+    i64s space_indexes = {arena};
     ARRAY_MAKE(&space_indexes);
 
     for (i64 char_idx = 0; char_idx < first_name_start_len; char_idx++) {
@@ -77,11 +77,11 @@ static string chicago_format_first_name(string_view first_name_view) {
     return abbrev;
 }
 
-static string chicago_format_name(const Name *name) {
-    string html = str_make("");
+static string chicago_format_name(Arena* arena, const Name *name) {
+    string html = str_make(arena, "");
 
     if (name->first_name.data) {
-        string abbrev_first_name = chicago_format_first_name(name->first_name);
+        string abbrev_first_name = chicago_format_first_name(arena, name->first_name);
         if (!str_empty(&abbrev_first_name)) {
             str_append(&html, "%.*s", abbrev_first_name.len, abbrev_first_name.data);
         }
@@ -102,15 +102,15 @@ static string chicago_format_name(const Name *name) {
     return html;
 }
 
-string chicago_create_book_bib_entry_html(Record record) {
+string chicago_create_book_bib_entry_html(Arena* arena, Record record) {
     string html = {};
 
-    Names authors = record_get_names(record, FIELD_TYPE_AUTHOR);
+    Names authors = record_get_names(arena, record, FIELD_TYPE_AUTHOR);
     if (ARRAY_EMPTY(&authors)) {
         return html;
     }
 
-    html = str_make("");
+    html = str_make(arena, "");
     str_append(&html, "<p>");
 
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
@@ -129,13 +129,13 @@ string chicago_create_book_bib_entry_html(Record record) {
             }
 
             if (author->first_name.data) {
-                string abbrev_first_name = chicago_format_first_name(author->first_name);
+                string abbrev_first_name = chicago_format_first_name(arena, author->first_name);
                 if (!str_empty(&abbrev_first_name)) {
                     str_append(&html, "%.*s", abbrev_first_name.len, abbrev_first_name.data);
                 }
             }
         } else {
-            string subsequent_name = chicago_format_name(author);
+            string subsequent_name = chicago_format_name(arena, author);
             str_append(&html, "%s", subsequent_name.data);
         }
 
@@ -146,16 +146,16 @@ string chicago_create_book_bib_entry_html(Record record) {
         }
     }
 
-    string translator_val = record_get_value_str(record, FIELD_TYPE_TRANSLATOR);
+    string translator_val = record_get_value_str(arena, record, FIELD_TYPE_TRANSLATOR);
     bool is_translation = !str_empty(&translator_val);
     if (is_translation) {
         str_append(&html, "Translated by ");
-        Names translators_names = record_get_names(record, FIELD_TYPE_TRANSLATOR);
+        Names translators_names = record_get_names(arena, record, FIELD_TYPE_TRANSLATOR);
 
         for (i32 translator_name_idx = 0; translator_name_idx < translators_names.len; translator_name_idx++) {
             const Name *translator_name = &translators_names.data[translator_name_idx];
 
-            string translator_name_fmt = chicago_format_name(translator_name);
+            string translator_name_fmt = chicago_format_name(arena, translator_name);
             str_append(&html, "%s", translator_name_fmt.data);
 
             if (translator_name_idx < translators_names.len - 1) {
@@ -166,8 +166,8 @@ string chicago_create_book_bib_entry_html(Record record) {
         str_append(&html, ". ");
     }
 
-    string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
-    string series_val = record_get_value_str(record, FIELD_TYPE_SERIES);
+    string title_val = record_get_value_str(arena, record, FIELD_TYPE_TITLE);
+    string series_val = record_get_value_str(arena, record, FIELD_TYPE_SERIES);
 
     if (!str_empty(&title_val)) {
         str_append(&html, "<i>%s</i>. ", title_val.data);
@@ -177,9 +177,9 @@ string chicago_create_book_bib_entry_html(Record record) {
         str_append(&html, "%s. ", series_val.data);
     }
 
-    string address_val = record_get_value_str(record, FIELD_TYPE_ADDRESS);
-    string publisher_val = record_get_value_str(record, FIELD_TYPE_PUBLISHER);
-    string year_val = record_get_value_str(record, FIELD_TYPE_YEAR);
+    string address_val = record_get_value_str(arena, record, FIELD_TYPE_ADDRESS);
+    string publisher_val = record_get_value_str(arena, record, FIELD_TYPE_PUBLISHER);
+    string year_val = record_get_value_str(arena, record, FIELD_TYPE_YEAR);
 
     if (!str_empty(&address_val)) {
         str_append(&html, "%s", address_val.data);
@@ -208,21 +208,21 @@ string chicago_create_book_bib_entry_html(Record record) {
     return html;
 }
 
-string chicago_create_book_note_html(Record record, const char *section_ref) {
+string chicago_create_book_note_html(Arena* arena, Record record, const char *section_ref) {
     string html = {};
 
-    Names authors = record_get_names(record, FIELD_TYPE_AUTHOR);
+    Names authors = record_get_names(arena, record, FIELD_TYPE_AUTHOR);
     if (ARRAY_EMPTY(&authors)) {
         return html;
     }
 
-    html = str_make("");
+    html = str_make(arena, "");
     str_append(&html, "<p>");
 
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
         const Name *author = &authors.data[author_idx];
 
-        string author_name_fmt = chicago_format_name(author);
+        string author_name_fmt = chicago_format_name(arena, author);
         str_append(&html, "%s", author_name_fmt.data);
 
         if (author_idx < authors.len - 2 || author_idx == authors.len - 1) {
@@ -232,9 +232,9 @@ string chicago_create_book_note_html(Record record, const char *section_ref) {
         }
     }
 
-    string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
-    string translator_val = record_get_value_str(record, FIELD_TYPE_TRANSLATOR);
-    string publisher_val = record_get_value_str(record, FIELD_TYPE_PUBLISHER);
+    string title_val = record_get_value_str(arena, record, FIELD_TYPE_TITLE);
+    string translator_val = record_get_value_str(arena, record, FIELD_TYPE_TRANSLATOR);
+    string publisher_val = record_get_value_str(arena, record, FIELD_TYPE_PUBLISHER);
     if (!str_empty(&title_val)) {
         str_append(&html, "<i>%s</i>", title_val.data);
 
@@ -246,12 +246,12 @@ string chicago_create_book_note_html(Record record, const char *section_ref) {
     }
 
     if (!str_empty(&translator_val)) {
-        Names translators_names = record_get_names(record, FIELD_TYPE_TRANSLATOR);
+        Names translators_names = record_get_names(arena, record, FIELD_TYPE_TRANSLATOR);
 
         for (i32 translator_name_idx = 0; translator_name_idx < translators_names.len; translator_name_idx++) {
             const Name *translator_name = &translators_names.data[translator_name_idx];
 
-            string translator_name_fmt = chicago_format_name(translator_name);
+            string translator_name_fmt = chicago_format_name(arena, translator_name);
             str_append(&html, "%s", translator_name_fmt.data);
 
             if (translator_name_idx < translators_names.len - 2) {
@@ -264,7 +264,7 @@ string chicago_create_book_note_html(Record record, const char *section_ref) {
         str_append(&html, " ");
     }
 
-    string year_val = record_get_value_str(record, FIELD_TYPE_YEAR);
+    string year_val = record_get_value_str(arena, record, FIELD_TYPE_YEAR);
     if (!str_empty(&publisher_val) || !str_empty(&year_val)) {
         str_append(&html, "(");
 
@@ -295,15 +295,15 @@ string chicago_create_book_note_html(Record record, const char *section_ref) {
     return html;
 }
 
-string chicago_create_book_short_note_html(Record record, const char* section_ref) {
+string chicago_create_book_short_note_html(Arena* arena, Record record, const char* section_ref) {
     string html = {};
 
-    Names authors = record_get_names(record, FIELD_TYPE_AUTHOR);
+    Names authors = record_get_names(arena, record, FIELD_TYPE_AUTHOR);
     if (ARRAY_EMPTY(&authors)) {
         return html;
     }
 
-    html = str_make("");
+    html = str_make(arena, "");
 
     str_append(&html, "<p>");
 
@@ -321,7 +321,7 @@ string chicago_create_book_short_note_html(Record record, const char* section_re
         }
     }
 
-    string title_val = record_get_value_str(record, FIELD_TYPE_TITLE);
+    string title_val = record_get_value_str(arena, record, FIELD_TYPE_TITLE);
     if (!str_empty(&title_val)) {
         str_append(&html, "<i>%s</i>", title_val.data);
     }
