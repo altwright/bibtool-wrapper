@@ -4,6 +4,7 @@
 
 #include "records.h"
 
+#include <assert.h>
 #include <ctype.h>
 #include <string.h>
 
@@ -34,6 +35,8 @@ EntryType record_get_entry_type(Arena* arena, Record record) {
     str_to_upper(&record_type_dyn_str);
 
     EntryType record_type_enum = ENTRY_TYPE_COUNT;
+
+    assert(record_type_dyn_str.len > 0);
 
 #ifndef X
 #define X(type) \
