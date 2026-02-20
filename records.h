@@ -53,7 +53,7 @@ typedef struct {
 } Name;
 
 typedef struct {
-    ARRAY(Name)
+    ARRAY_TYPE(Name)
     string str;
 } Names;
 

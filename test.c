@@ -8,6 +8,12 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#include "libs/altcore/hashmap.h"
+
+typedef struct {
+    HASHMAP_TYPE(const char*, int)
+} Hashmap;
+
 int main(int argc, char **argv) {
     bib_init("test");
 
@@ -24,4 +30,11 @@ int main(int argc, char **argv) {
     bib_close_db();
 
     bib_uninit();
+
+    Hashmap hashmap = {HASHMAP_TYPE_STR_KEY};
+    int default_val = 0;
+
+    HASHMAP_MAKE(&hashmap, &default_val);
+
+    HASHMAP_FREE(&hashmap);
 }
