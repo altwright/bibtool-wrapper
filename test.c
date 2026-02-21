@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "libs/altcore/hashmap.h"
+#include "libs/altcore/malloc.h"
 
 typedef struct {
     HASHMAP_FIELDS(int, int)
@@ -34,6 +35,8 @@ int main(int argc, char **argv) {
     Hashmap hashmap = {HASHMAP_TYPE_NON_STR_KEY};
     int default_val = -1;
 
+    alt_init(1024LL * 1024LL);
+
     HASHMAP_MAKE(&hashmap, &default_val);
 
     int key1 = 0;
@@ -47,8 +50,13 @@ int main(int argc, char **argv) {
     i64 pair_idx = HASHMAP_GET_IDX(&hashmap, &key2);
     assert(pair_idx >= 0);
 
-    typeof(hashmap.hash) pair_ptr = HASHMAP_GET_ELEM(&hashmap, &pair_idx);
-    printf("%d : %d\n", pair_ptr->key, pair_ptr->value);
+    auto pair_ptr = HASHMAP_GET_ELEM(&hashmap, &pair_idx);
+
+    HASHMAP_FOR(pair, &hashmap) {
+        printf("%d : %d\n", pair->key, pair->value);
+    }
 
     HASHMAP_FREE(&hashmap);
+
+    alt_uninit();
 }
