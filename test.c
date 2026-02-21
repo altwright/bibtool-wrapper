@@ -11,7 +11,7 @@
 #include "libs/altcore/hashmap.h"
 
 typedef struct {
-    HASHMAP_FIELDS(const char*, int)
+    HASHMAP_FIELDS(int, int)
 } Hashmap;
 
 int main(int argc, char **argv) {
@@ -31,24 +31,24 @@ int main(int argc, char **argv) {
 
     bib_uninit();
 
-    Hashmap hashmap = {HASHMAP_TYPE_STR_KEY};
+    Hashmap hashmap = {HASHMAP_TYPE_NON_STR_KEY};
     int default_val = -1;
 
     HASHMAP_MAKE(&hashmap, &default_val);
 
-    const char* key1 = "test";
+    int key1 = 0;
     int val = 10;
     HASHMAP_PUT(&hashmap, &key1, &val);
 
-    const char* key2 = "test2";
+    int key2 = 1;
     val = 11;
     HASHMAP_PUT(&hashmap, &key2, &val);
 
-    HASHMAP_DEL(&hashmap, &key1);
+    i64 pair_idx = HASHMAP_GET_IDX(&hashmap, &key2);
+    assert(pair_idx >= 0);
 
-    HASHMAP_FOR(key_val, &hashmap) {
-        printf("%s : %d\n", key_val->key, key_val->value);
-    }
+    typeof(hashmap.hash) pair_ptr = HASHMAP_GET_ELEM(&hashmap, &pair_idx);
+    printf("%d : %d\n", pair_ptr->key, pair_ptr->value);
 
     HASHMAP_FREE(&hashmap);
 }
