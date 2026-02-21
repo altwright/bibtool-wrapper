@@ -40,12 +40,15 @@ int main(int argc, char **argv) {
     int val = 10;
     HASHMAP_PUT(&hashmap, &key1, &val);
 
-    val = 1;
-
     const char* key2 = "test2";
-    val = HASHMAP_GET(&hashmap, &key1);
+    val = 11;
+    HASHMAP_PUT(&hashmap, &key2, &val);
 
-    printf("%d\n", val);
+    HASHMAP_DEL(&hashmap, &key1);
+
+    HASHMAP_FOR(key_val, &hashmap) {
+        printf("%s : %d\n", key_val->key, key_val->value);
+    }
 
     HASHMAP_FREE(&hashmap);
 }
