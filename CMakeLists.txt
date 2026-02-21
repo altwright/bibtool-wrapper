@@ -18,7 +18,9 @@ add_executable(bibtool_wrapper_test
         test.c
 )
 
-add_subdirectory(libs/altcore)
+if (NOT TARGET altcore)
+    add_subdirectory(libs/altcore)
+endif()
 
 target_include_directories(bibtool_wrapper PRIVATE
         libs/
