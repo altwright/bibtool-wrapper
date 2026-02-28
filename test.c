@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 #include "libs/altcore/hashmap.h"
-#include "libs/altcore/malloc.h"
+#include "libs/altcore/memory.h"
 
 typedef struct {
     HASHMAP_FIELDS(int, int)

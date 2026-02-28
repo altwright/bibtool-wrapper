@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "altcore/malloc.h"
+#include "altcore/memory.h"
 #include "altcore/arenas.h"
 #include "chicago.h"
 #include "types.h"
