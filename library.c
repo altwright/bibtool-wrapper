@@ -52,7 +52,7 @@ bool bib_open_db(const char *filepath) {
     string dup_filepath = str_make(&tmp, "%s", filepath);
     result = read_db(g_db, (String) dup_filepath.data, false);
 
-    return result;
+    return !result;
 }
 
 void bib_close_db() {
