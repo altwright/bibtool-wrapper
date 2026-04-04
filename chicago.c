@@ -111,7 +111,7 @@ string chicago_create_book_bib_entry_html(Arena* arena, Record record) {
     }
 
     html = str_make(arena, "");
-    str_append(&html, "<p>");
+    str_append(&html, "<span>");
 
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
         const Name *author = &authors.data[author_idx];
@@ -204,7 +204,7 @@ string chicago_create_book_bib_entry_html(Arena* arena, Record record) {
         str_append(&html, "%s.", year_val.data);
     }
 
-    str_append(&html, "</p>");
+    str_append(&html, "</span>");
     return html;
 }
 
@@ -217,7 +217,7 @@ string chicago_create_book_note_html(Arena* arena, Record record, const char *se
     }
 
     html = str_make(arena, "");
-    str_append(&html, "<p>");
+    str_append(&html, "<span>");
 
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
         const Name *author = &authors.data[author_idx];
@@ -290,7 +290,7 @@ string chicago_create_book_note_html(Arena* arena, Record record, const char *se
         str_append(&html, ".");
     }
 
-    str_append(&html, "</p>");
+    str_append(&html, "</span>");
 
     return html;
 }
@@ -305,7 +305,7 @@ string chicago_create_book_short_note_html(Arena* arena, Record record, const ch
 
     html = str_make(arena, "");
 
-    str_append(&html, "<p>");
+    str_append(&html, "<span>");
 
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
         const Name *author = &authors.data[author_idx];
@@ -332,7 +332,7 @@ string chicago_create_book_short_note_html(Arena* arena, Record record, const ch
         str_append(&html, ".");
     }
 
-    str_append(&html, "</p>");
+    str_append(&html, "</span>");
 
     return html;
 }
