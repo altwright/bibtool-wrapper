@@ -161,7 +161,7 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                 Name author = {};
 
                 string_view author_str_view = {
-                    .data = author_name_start,
+                    .start = author_name_start,
                 };
 
                 if (author_idx < and_substr_indexes.len) {
@@ -180,20 +180,20 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                 ARRAY_MAKE(&comma_indexes);
 
                 for (i64 char_idx = 0; char_idx < author_str_view.len; char_idx++) {
-                    if (author_str_view.data[char_idx] == ',') {
+                    if (author_str_view.start[char_idx] == ',') {
                         ARRAY_PUSH(&comma_indexes, &char_idx);
                     }
                 }
 
                 if (ARRAY_EMPTY(&comma_indexes)) {
                     // {Firstname Lastname}
-                    author.first_name.data = author_str_view.data;
+                    author.first_name.start = author_str_view.start;
                     author.first_name.len = author_str_view.len;
-                    i64 next_space_idx = find_next_space_char_idx(author_str_view.data);
+                    i64 next_space_idx = find_next_space_char_idx(author_str_view.start);
                     if (next_space_idx >= 0 && next_space_idx < author_str_view.len) {
                         author.first_name.len = next_space_idx;
 
-                        const char *last_name_str = author_str_view.data + next_space_idx;
+                        const char *last_name_str = author_str_view.start + next_space_idx;
                         i64 next_nonspace_idx = find_next_nonspace_char_idx(last_name_str);
                         if (next_nonspace_idx < 0) {
                             last_name_str = nullptr;
@@ -202,21 +202,21 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                         }
 
                         if (last_name_str) {
-                            author.last_name.data = last_name_str;
-                            author.last_name.len = (author_str_view.data + author_str_view.len) - last_name_str;
+                            author.last_name.start = last_name_str;
+                            author.last_name.len = (author_str_view.start + author_str_view.len) - last_name_str;
                         }
                     }
                 } else {
                     // {Lastname, ... }
 
-                    author.last_name.data = author_str_view.data;
+                    author.last_name.start = author_str_view.start;
                     author.last_name.len = comma_indexes.data[0];
-                    i64 next_space_idx = find_next_space_char_idx(author_str_view.data + comma_indexes.data[0]);
+                    i64 next_space_idx = find_next_space_char_idx(author_str_view.start + comma_indexes.data[0]);
                     if (next_space_idx >= 0 && next_space_idx < (author_str_view.len - comma_indexes.data[0])) {
                         if (comma_indexes.len == 1) {
                             // {Lastname, Firstname}
 
-                            const char *first_name_str = author_str_view.data + comma_indexes.data[0] + next_space_idx;
+                            const char *first_name_str = author_str_view.start + comma_indexes.data[0] + next_space_idx;
                             i64 next_nonspace_idx = find_next_nonspace_char_idx(first_name_str);
                             if (next_nonspace_idx < 0) {
                                 first_name_str = nullptr;
@@ -225,13 +225,13 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                             }
 
                             if (first_name_str) {
-                                author.first_name.data = first_name_str;
-                                author.first_name.len = (author_str_view.data + author_str_view.len) - first_name_str;
+                                author.first_name.start = first_name_str;
+                                author.first_name.len = (author_str_view.start + author_str_view.len) - first_name_str;
                             }
                         } else {
                             // {Lastname, Suffix, Firstname}
 
-                            const char *suffix_str = author_str_view.data + next_space_idx;
+                            const char *suffix_str = author_str_view.start + next_space_idx;
                             i64 next_nonspace_idx = find_next_nonspace_char_idx(suffix_str);
                             if (next_nonspace_idx < 0) {
                                 suffix_str = nullptr;
@@ -240,11 +240,11 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                             }
 
                             if (suffix_str) {
-                                author.suffix.data = suffix_str;
+                                author.suffix.start = suffix_str;
                                 author.suffix.len = comma_indexes.data[1] - comma_indexes.data[0] - 1;
                             }
 
-                            const char *first_name_str = author_str_view.data + comma_indexes.data[1] + 1;
+                            const char *first_name_str = author_str_view.start + comma_indexes.data[1] + 1;
                             next_nonspace_idx = find_next_nonspace_char_idx(first_name_str);
                             if (next_nonspace_idx < 0) {
                                 first_name_str = nullptr;
@@ -253,8 +253,8 @@ Names record_get_names(Arena* arena, Record record, FieldType field) {
                             }
 
                             if (first_name_str) {
-                                author.first_name.data = first_name_str;
-                                author.first_name.len = (author_str_view.data + author_str_view.len) - first_name_str;
+                                author.first_name.start = first_name_str;
+                                author.first_name.len = (author_str_view.start + author_str_view.len) - first_name_str;
                             }
                         }
                     }

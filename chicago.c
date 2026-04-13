@@ -11,7 +11,7 @@
 
 static string chicago_format_first_name(Arena* arena, string_view first_name_view) {
     string abbrev = {};
-    const char *first_name_start = first_name_view.data;
+    const char *first_name_start = first_name_view.start;
     i64 first_name_start_len = first_name_view.len;
 
     if (isspace(first_name_start[0])) {
@@ -80,22 +80,22 @@ static string chicago_format_first_name(Arena* arena, string_view first_name_vie
 static string chicago_format_name(Arena* arena, const Name *name) {
     string html = str_make(arena, "");
 
-    if (name->first_name.data) {
+    if (name->first_name.start) {
         string abbrev_first_name = chicago_format_first_name(arena, name->first_name);
         if (!str_empty(&abbrev_first_name)) {
             str_append(&html, "%.*s", abbrev_first_name.len, abbrev_first_name.data);
         }
 
-        if (name->last_name.data) {
+        if (name->last_name.start) {
             str_append(&html, " ");
         }
     }
 
-    if (name->last_name.data) {
-        str_append(&html, "%.*s", name->last_name.len, name->last_name.data);
+    if (name->last_name.start) {
+        str_append(&html, "%.*s", name->last_name.len, name->last_name.start);
 
-        if (name->suffix.data) {
-            str_append(&html, " %.*s", name->suffix.len, name->suffix.data);
+        if (name->suffix.start) {
+            str_append(&html, " %.*s", name->suffix.len, name->suffix.start);
         }
     }
 
@@ -118,17 +118,17 @@ string chicago_create_book_bib_entry_html(Arena* arena, Record record) {
 
         if (author_idx == 0) {
             // Leading name for alphabetical order
-            if (author->last_name.data) {
-                str_append(&html, "%.*s", author->last_name.len, author->last_name.data);
+            if (author->last_name.start) {
+                str_append(&html, "%.*s", author->last_name.len, author->last_name.start);
 
-                if (author->suffix.data) {
-                    str_append(&html, " %.*s", author->suffix.len, author->suffix.data);
+                if (author->suffix.start) {
+                    str_append(&html, " %.*s", author->suffix.len, author->suffix.start);
                 }
 
                 str_append(&html, ", ");
             }
 
-            if (author->first_name.data) {
+            if (author->first_name.start) {
                 string abbrev_first_name = chicago_format_first_name(arena, author->first_name);
                 if (!str_empty(&abbrev_first_name)) {
                     str_append(&html, "%.*s", abbrev_first_name.len, abbrev_first_name.data);
@@ -310,8 +310,8 @@ string chicago_create_book_short_note_html(Arena* arena, Record record, const ch
     for (i32 author_idx = 0; author_idx < authors.len; author_idx++) {
         const Name *author = &authors.data[author_idx];
 
-        if (author->last_name.data) {
-            str_append(&html, "%.*s", author->last_name.len, author->last_name.data);
+        if (author->last_name.start) {
+            str_append(&html, "%.*s", author->last_name.len, author->last_name.start);
         }
 
         if (author_idx < authors.len - 2 || author_idx == authors.len - 1) {
