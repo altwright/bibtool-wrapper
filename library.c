@@ -7,7 +7,6 @@
 #include "altcore/memory.h"
 #include "altcore/arenas.h"
 #include "chicago.h"
-#include "types.h"
 #include "records.h"
 #include "bibtool_guard.h"
 
