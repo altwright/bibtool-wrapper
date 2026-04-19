@@ -8,7 +8,7 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "types.h"
+#include "altcore/types.h"
 #include "chars.h"
 
 static const char *k_field_type_strs[] = {
